@@ -4,12 +4,28 @@ const os = require('os')
 const bodyParser = require('koa-bodyparser')
 const koaLogger = require('koa-logger')
 const koaBody = require('koa-body')
+const Router = require('koa-router')
 
 const app = new Koa()
 
+const router = new Router()
+
+router
+  .get('/', (ctx) => {
+    ctx.body = 'Hello World'
+  })
+  .get('/times', async (ctx) => {
+    ctx.body = await influx.query(`
+      select * from response_times
+      where host = ${Influx.escape.stringLit(os.hostname())}
+      order by time desc
+      limit 10
+    `)
+  })
+
 const influx = new Influx.InfluxDB({
   host: 'localhost',
-  database: 'express_response_db',
+  database: 'koa-test',
   schema: [
     {
       measurement: 'response_times',
@@ -42,20 +58,17 @@ app.use(async (ctx, next) => {
 app
   .use(koaLogger())
   .use(koaBody({}))
-
-app.use((ctx) => {
-  ctx.body = 'Hello Koa'
-})
-
-app.use(bodyParser())
+  .use(bodyParser())
+  .use(router.routes())
+  .use(router.allowedMethods())
 
 influx.getDatabaseNames()
   .then((names) => {
-    if (names.includes('express_response_db')) {
+    if (names.includes('koa-test')) {
       return
     }
     // eslint-disable-next-line consistent-return
-    return influx.createDatabase('express_response_db')
+    return influx.createDatabase('koa-test')
   })
   .then(() => {
     app.listen(3000, () => {
