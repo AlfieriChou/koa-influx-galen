@@ -1,0 +1,39 @@
+{
+  "name": "koa-influx-galen",
+  "version": "1.0.0",
+  "description": "koa influx galen.",
+  "main": "index.js",
+  "repository": "https://github.com/AlfieriChou/koa-influx-galen",
+  "author": "AlfieriChou <alfierichou@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon server.js",
+    "lint": "eslint --ext .js ./ --fix",
+    "release": "standard-version"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^9.1.1",
+    "@commitlint/config-conventional": "^9.1.1",
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-standard": "^3.1.0",
+    "eslint-friendly-formatter": "^4.0.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "standard-version": "^8.0.2"
+  },
+  "dependencies": {
+    "koa": "^2.13.0",
+    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^9.1.0",
+    "lodash": "^4.17.19",
+    "read-dir-filenames": "^1.0.5"
+  }
+}
