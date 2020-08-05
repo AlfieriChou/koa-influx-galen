@@ -34,10 +34,10 @@ module.exports = (app, config) => {
   app.context.influx = influxClient
   influxClient.getDatabaseNames()
     .then((names) => {
-      if (names.includes(influx.host)) {
+      if (names.includes(influx.database)) {
         return
       }
       // eslint-disable-next-line consistent-return
-      return influxClient.createDatabase(influx.host)
+      return influxClient.createDatabase(influx.database)
     })
 }
