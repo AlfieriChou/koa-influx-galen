@@ -6,6 +6,8 @@ const koaLogger = require('koa-logger')
 const koaBody = require('koa-body')
 const Router = require('koa-router')
 
+const createInfluxClient = require('./framework/createInfluxClient')
+
 const app = new Koa()
 
 const router = new Router()
@@ -15,7 +17,7 @@ router
     ctx.body = 'Hello World'
   })
   .get('/times', async (ctx) => {
-    ctx.body = await influx.query(`
+    ctx.body = await ctx.influx.query(`
       select * from response_times
       where host = ${Influx.escape.stringLit(os.hostname())}
       order by time desc
@@ -23,29 +25,14 @@ router
     `)
   })
 
-const influx = new Influx.InfluxDB({
-  host: 'localhost',
-  database: 'koa-test',
-  schema: [
-    {
-      measurement: 'response_times',
-      fields: {
-        path: Influx.FieldType.STRING,
-        duration: Influx.FieldType.INTEGER
-      },
-      tags: [
-        'host'
-      ]
-    }
-  ]
-})
+createInfluxClient(app, {})
 
 app.use(async (ctx, next) => {
   const start = Date.now()
   await next()
   const duration = Date.now() - start
   try {
-    await influx.writePoints([{
+    await ctx.influx.writePoints([{
       measurement: 'response_times',
       tags: { host: os.hostname() },
       fields: { duration, path: ctx.path }
@@ -62,19 +49,6 @@ app
   .use(router.routes())
   .use(router.allowedMethods())
 
-influx.getDatabaseNames()
-  .then((names) => {
-    if (names.includes('koa-test')) {
-      return
-    }
-    // eslint-disable-next-line consistent-return
-    return influx.createDatabase('koa-test')
-  })
-  .then(() => {
-    app.listen(3000, () => {
-      console.log('Listening on port 3000')
-    })
-  })
-  .catch((err) => {
-    console.error(`Error creating Influx database!`, err)
-  })
+app.listen(3000, () => {
+  console.log('Listening on port 3000')
+})

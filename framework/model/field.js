@@ -7,7 +7,7 @@ const fieldTypeMap = {
   boolean: Influx.FieldType.BOOLEAN
 }
 
-module.exports = props => Object.entities(props).reduce((ret, [key, value]) => {
+module.exports = props => Object.entries(props).reduce((ret, [key, value]) => {
   if (!fieldTypeMap[value.type]) {
     throw new Error(`Invalid field type: ${value.type}`)
   }

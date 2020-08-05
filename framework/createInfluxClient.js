@@ -6,7 +6,7 @@ const createSchema = require('./model/schema')
 
 module.exports = (app, config) => {
   const {
-    influx = { host: 'localhost', database: 'test' },
+    influx = { host: '127.0.0.1', database: 'test' },
     influxModelPath = path.join(process.cwd(), '/models')
   } = config
   // eslint-disable-next-line no-param-reassign
@@ -25,10 +25,19 @@ module.exports = (app, config) => {
       ...schema
     })]
   }, [])
-  // eslint-disable-next-line no-param-reassign
-  app.context.influx = new Influx.InfluxDB({
+  const influxClient = new Influx.InfluxDB({
     host: influx.host,
     database: influx.database,
     schema: schemas
   })
+  // eslint-disable-next-line no-param-reassign
+  app.context.influx = influxClient
+  influxClient.getDatabaseNames()
+    .then((names) => {
+      if (names.includes(influx.host)) {
+        return
+      }
+      // eslint-disable-next-line consistent-return
+      return influxClient.createDatabase(influx.host)
+    })
 }

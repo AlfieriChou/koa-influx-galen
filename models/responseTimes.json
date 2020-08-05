@@ -1,0 +1,7 @@
+{
+  "tags": ["host"],
+  "properties": {
+    "path": { "type": "string" },
+    "duration": { "type": "integer" }
+  }
+}
