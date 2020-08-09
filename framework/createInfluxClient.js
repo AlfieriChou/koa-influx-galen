@@ -1,6 +1,7 @@
 const Influx = require('influx')
 const path = require('path')
 const readDirFilenames = require('read-dir-filenames')
+const _ = require('lodash')
 
 const createSchema = require('./model/schema')
 
@@ -21,7 +22,7 @@ module.exports = (app, config) => {
       [filename]: schema
     }
     return [...ret, createSchema({
-      tableName: filename,
+      tableName: _.snakeCase(filename),
       ...schema
     })]
   }, [])
