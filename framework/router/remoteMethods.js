@@ -1,4 +1,4 @@
-module.exports = (schema) => {
+const buildBaseRemoteMethods = (schema) => {
   const {
     modelName, properties, description = modelName, required = []
   } = schema
@@ -42,5 +42,28 @@ module.exports = (schema) => {
         }
       }
     }
+  }
+}
+
+module.exports = (schema) => {
+  const { remoteMethods } = schema
+  const baseRemoteMethods = buildBaseRemoteMethods(schema)
+  return {
+    ...baseRemoteMethods,
+    ...Object.entries(remoteMethods).reduce((acc, [key, value]) => {
+      if (baseRemoteMethods[key]) {
+        return {
+          ...acc,
+          [key]: {
+            ...baseRemoteMethods[key],
+            ...value
+          }
+        }
+      }
+      return {
+        ...acc,
+        [key]: value
+      }
+    }, {})
   }
 }

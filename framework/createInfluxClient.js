@@ -4,6 +4,7 @@ const readDirFilenames = require('read-dir-filenames')
 const _ = require('lodash')
 
 const createSchema = require('./model/schema')
+const buidlRemoteMethods = require('./router/remoteMethods')
 
 module.exports = (app, config) => {
   const {
@@ -16,10 +17,26 @@ module.exports = (app, config) => {
     // eslint-disable-next-line global-require, import/no-dynamic-require
     const schema = require(filepath)
     const filename = path.basename(filepath).replace(/\.\w+$/, '')
+
+    const remoteMethods = buidlRemoteMethods({
+      remoteMethods: {},
+      ...schema,
+      modelName: filename,
+      required: Object.entries(schema.properties).reduce((acc, [key, prop]) => {
+        if (prop.required) {
+          return [...acc, key]
+        }
+        return acc
+      }, [])
+    })
+
     // eslint-disable-next-line no-param-reassign
     app.context.jsonSchema = {
       ...app.context.jsonSchema,
-      [filename]: schema
+      [filename]: {
+        ...schema,
+        remoteMethods
+      }
     }
     return [...ret, createSchema({
       tableName: _.snakeCase(filename),
