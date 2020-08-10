@@ -1,5 +1,5 @@
 const Koa = require('koa')
-const Influx = require('influx')
+// const Influx = require('influx')
 const os = require('os')
 const bodyParser = require('koa-bodyparser')
 const koaLogger = require('koa-logger')
@@ -7,6 +7,7 @@ const koaBody = require('koa-body')
 const Router = require('koa-router')
 
 const createInfluxClient = require('./framework/createInfluxClient')
+const BaseController = require('./framework/controller/baseController')
 
 const app = new Koa()
 
@@ -17,12 +18,14 @@ router
     ctx.body = 'Hello World'
   })
   .get('/times', async (ctx) => {
-    ctx.body = await ctx.influx.query(`
-      select * from response_times
-      where host = ${Influx.escape.stringLit(os.hostname())}
-      order by time desc
-      limit 10
-    `)
+    // ctx.body = await ctx.influx.query(`
+    //   select * from response_times
+    //   where host = ${Influx.escape.stringLit(os.hostname())}
+    //   order by time desc
+    //   limit 10
+    // `)
+    ctx.tableName = 'response_times'
+    ctx.body = await BaseController.index(ctx)
   })
 
 createInfluxClient(app, {})
@@ -50,5 +53,5 @@ app
   .use(router.allowedMethods())
 
 app.listen(3000, () => {
-  console.log('Listening on port 3000')
+  console.log('Listening on port 3000', os.hostname())
 })

@@ -7,7 +7,7 @@ const parseFilter = (tableName, filter) => {
   let query = `select * from ${tableName}`
   if (Object.keys(where).length > 0) {
     Object.entries(where).forEach(([key, value]) => {
-      query += ` where ${key} = ${value}`
+      query += ` where ${key} = '${value}'`
     })
   }
   if (order) {
@@ -24,7 +24,7 @@ const parseFilter = (tableName, filter) => {
 
 module.exports = class Controller {
   static async index (ctx) {
-    const filter = ctx.query.filter || {
+    const filter = ctx.query.filter ? JSON.parse(ctx.query.filter) : {
       where: {}, order: 'id desc', limit: 100, offset: 0
     }
     return ctx.influx.query(parseFilter(ctx.tableName, filter))
