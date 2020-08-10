@@ -1,8 +1,33 @@
 const _ = require('lodash')
 
+const parseFilter = (tableName, filter) => {
+  const {
+    where, order, limit, offset
+  } = filter
+  let query = `select * from ${tableName}`
+  if (Object.keys(where).length > 0) {
+    Object.entries(where).forEach(([key, value]) => {
+      query += ` where ${key} = ${value}`
+    })
+  }
+  if (order) {
+    query += ` order by ${order}`
+  }
+  if (offset) {
+    query += ` offset ${offset}`
+  }
+  if (limit) {
+    query += ` limit ${limit}`
+  }
+  return query
+}
+
 module.exports = class Controller {
   static async index (ctx) {
-    return []
+    const filter = ctx.query.filter || {
+      where: {}, order: 'id desc', limit: 100, offset: 0
+    }
+    return ctx.influx.query(parseFilter(ctx.tableName, filter))
   }
 
   // eslint-disable-next-line consistent-return
