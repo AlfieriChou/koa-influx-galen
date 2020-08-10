@@ -9,41 +9,43 @@ const createInfluxClient = require('./createInfluxClient')
 
 const app = new Koa()
 
-createInfluxClient(app, {})
+module.exports = (config) => {
+  createInfluxClient(app, config || {})
 
-app.use(async (ctx, next) => {
-  const start = Date.now()
-  if (ctx.request.method === 'OPTIONS') {
-    ctx.response.status = 200
-  }
-  ctx.set('Access-Control-Allow-Origin', ctx.request.header.origin)
-  ctx.set('Access-Control-Allow-Credentials', true)
-  ctx.set('Access-Control-Max-Age', 86400000)
-  ctx.set('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, POST, DELETE')
-  ctx.set('Access-Control-Allow-Headers', 'x-requested-with, accept, origin, content-type')
-  await next()
-  const duration = Date.now() - start
-  try {
-    await ctx.influx.writePoints([{
-      measurement: 'response_times',
-      tags: { host: os.hostname() },
-      fields: { duration, path: ctx.path }
-    }])
-  } catch (err) {
-    ctx.status = err.statusCode || err.status || 500
-    ctx.body = {
-      code: ctx.status,
-      message: err.message,
-      stack: err.stack
+  app.use(async (ctx, next) => {
+    const start = Date.now()
+    if (ctx.request.method === 'OPTIONS') {
+      ctx.response.status = 200
     }
-  }
-})
+    ctx.set('Access-Control-Allow-Origin', ctx.request.header.origin)
+    ctx.set('Access-Control-Allow-Credentials', true)
+    ctx.set('Access-Control-Max-Age', 86400000)
+    ctx.set('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, POST, DELETE')
+    ctx.set('Access-Control-Allow-Headers', 'x-requested-with, accept, origin, content-type')
+    await next()
+    const duration = Date.now() - start
+    try {
+      await ctx.influx.writePoints([{
+        measurement: 'response_times',
+        tags: { host: os.hostname() },
+        fields: { duration, path: ctx.path }
+      }])
+    } catch (err) {
+      ctx.status = err.status || 500
+      ctx.body = {
+        code: ctx.status,
+        message: err.message,
+        stack: err.stack
+      }
+    }
+  })
 
-app
-  .use(koaLogger())
-  .use(koaBody({}))
-  .use(bodyParser())
-  .use(router.routes())
-  .use(router.allowedMethods())
+  app
+    .use(koaLogger())
+    .use(koaBody({}))
+    .use(bodyParser())
+    .use(router.routes())
+    .use(router.allowedMethods())
 
-module.exports = app
+  return app
+}
