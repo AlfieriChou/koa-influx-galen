@@ -3,15 +3,16 @@ const os = require('os')
 const bodyParser = require('koa-bodyparser')
 const koaLogger = require('koa-logger')
 const koaBody = require('koa-body')
-const router = require('./createRouter')
 
 const createInfluxClient = require('./createInfluxClient')
+const createRouter = require('./createRouter')
 
-const app = new Koa()
+module.exports = async (config) => {
+  const app = new Koa()
 
-module.exports = (config) => {
   createInfluxClient(app, config || {})
 
+  const router = await createRouter(app.context)
   app.use(async (ctx, next) => {
     const start = Date.now()
     if (ctx.request.method === 'OPTIONS') {

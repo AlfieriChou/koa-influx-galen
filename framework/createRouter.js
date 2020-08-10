@@ -1,22 +1,48 @@
 const Router = require('koa-router')
+const _ = require('lodash')
 
 const BaseController = require('./controller/baseController')
 
-const router = new Router()
+const camelObjKeys = (obj) => {
+  if (Array.isArray(obj)) {
+    return obj.map(v => camelObjKeys(v))
+  }
+  if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj)
+      .reduce((result, key) => ({
+        ...result,
+        [_.camelCase(key)]: camelObjKeys(obj[key])
+      }), {})
+  }
+  return obj
+}
 
-router
-  .get('/', (ctx) => {
-    ctx.body = 'Hello World'
-  })
-  .get('/times', async (ctx) => {
-    // ctx.body = await ctx.influx.query(`
-    //   select * from response_times
-    //   where host = ${Influx.escape.stringLit(os.hostname())}
-    //   order by time desc
-    //   limit 10
-    // `)
-    ctx.tableName = 'response_times'
-    ctx.body = await BaseController.index(ctx)
-  })
+module.exports = async (context, prefix = '/v1') => {
+  const router = new Router()
+  router.prefix(prefix)
 
-module.exports = router
+  const { remoteMethods } = context
+
+  await Object.entries(remoteMethods).reduce(async (promise, [key, value]) => {
+    await promise
+    const [modelName, handler] = key.split('-')
+    router[value.method](
+      value.path,
+      // eslint-disable-next-line consistent-return
+      async (ctx) => {
+        ctx.tableName = _.snakeCase(modelName)
+        if (BaseController[handler]) {
+          const ret = await BaseController[handler](ctx)
+          ctx.body = {
+            status: 200,
+            message: 'success',
+            result: camelObjKeys(ret)
+          }
+          return
+        }
+        ctx.throw(404, 'not found')
+      }
+    )
+  }, Promise.resolve())
+  return router
+}
