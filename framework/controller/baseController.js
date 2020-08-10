@@ -25,7 +25,7 @@ const parseFilter = (tableName, filter) => {
 module.exports = class Controller {
   static async index (ctx) {
     const filter = ctx.query.filter ? JSON.parse(ctx.query.filter) : {
-      where: {}, order: 'id desc', limit: 100, offset: 0
+      where: {}, order: 'time desc', limit: 100, offset: 0
     }
     return ctx.influx.query(parseFilter(ctx.tableName, filter))
   }

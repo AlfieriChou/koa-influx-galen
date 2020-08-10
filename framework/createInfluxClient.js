@@ -11,8 +11,10 @@ module.exports = (app, config) => {
     influx = { host: '127.0.0.1', database: 'test' },
     influxModelPath = path.join(process.cwd(), '/models')
   } = config
+  const ctx = app.context
   // eslint-disable-next-line no-param-reassign
-  app.context.jsonSchema = {}
+  ctx.jsonSchema = {}
+  ctx.remoteMethods = {}
   const schemas = readDirFilenames(influxModelPath).reduce((ret, filepath) => {
     // eslint-disable-next-line global-require, import/no-dynamic-require
     const schema = require(filepath)
@@ -30,9 +32,17 @@ module.exports = (app, config) => {
       }, [])
     })
 
+    ctx.remoteMethods = {
+      ...ctx.remoteMethods,
+      ...Object.entries(remoteMethods).reduce((acc, [key, value]) => ({
+        ...acc,
+        [`${filename}-${key}`]: value
+      }), {})
+    }
+
     // eslint-disable-next-line no-param-reassign
-    app.context.jsonSchema = {
-      ...app.context.jsonSchema,
+    ctx.jsonSchema = {
+      ...ctx.jsonSchema,
       [filename]: {
         ...schema,
         remoteMethods
@@ -49,7 +59,7 @@ module.exports = (app, config) => {
     schema: schemas
   })
   // eslint-disable-next-line no-param-reassign
-  app.context.influx = influxClient
+  ctx.influx = influxClient
   influxClient.getDatabaseNames()
     .then((names) => {
       if (names.includes(influx.database)) {
