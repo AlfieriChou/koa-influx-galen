@@ -6,11 +6,7 @@ const _ = require('lodash')
 const createSchema = require('./model/schema')
 const buidlRemoteMethods = require('./router/remoteMethods')
 
-module.exports = (app, config) => {
-  const {
-    influx = { host: '127.0.0.1', database: 'test' },
-    influxModelPath = path.join(process.cwd(), '/app/models')
-  } = config
+module.exports = (app, { influx, influxModelPath }) => {
   const ctx = app.context
   // eslint-disable-next-line no-param-reassign
   ctx.jsonSchema = {}
