@@ -9,7 +9,7 @@ const buidlRemoteMethods = require('./router/remoteMethods')
 module.exports = (app, config) => {
   const {
     influx = { host: '127.0.0.1', database: 'test' },
-    influxModelPath = path.join(process.cwd(), '/models')
+    influxModelPath = path.join(process.cwd(), '/app/models')
   } = config
   const ctx = app.context
   // eslint-disable-next-line no-param-reassign

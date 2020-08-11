@@ -21,7 +21,7 @@ module.exports = async (context, prefix = '/v1') => {
   const router = new Router()
   router.prefix(prefix)
 
-  const { remoteMethods } = context
+  const { remoteMethods, jsonSchema } = context
 
   await Object.entries(remoteMethods).reduce(async (promise, [key, value]) => {
     await promise
@@ -31,6 +31,7 @@ module.exports = async (context, prefix = '/v1') => {
       // eslint-disable-next-line consistent-return
       async (ctx) => {
         ctx.tableName = _.snakeCase(modelName)
+        ctx.schema = jsonSchema[modelName]
         if (BaseController[handler]) {
           const ret = await BaseController[handler](ctx)
           ctx.body = {

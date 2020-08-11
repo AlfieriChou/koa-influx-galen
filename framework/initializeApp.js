@@ -4,12 +4,23 @@ const bodyParser = require('koa-bodyparser')
 const koaLogger = require('koa-logger')
 const koaBody = require('koa-body')
 
+const path = require('path')
+
+const bindPropsToContext = require('./bindPropsToContext')
 const createInfluxClient = require('./createInfluxClient')
 const createRouter = require('./createRouter')
 
-module.exports = async (config) => {
+module.exports = async (baseConfig) => {
   const app = new Koa()
 
+  const projectRootPath = process.cwd()
+  const config = {
+    controllerDirPath: baseConfig.controllerDirPath || path.join(projectRootPath, '/app/controller'),
+    serviceDirPath: baseConfig.serviceDirPath || path.join(projectRootPath, '/app/service'),
+    ...baseConfig
+  }
+
+  bindPropsToContext(app, config || {})
   createInfluxClient(app, config || {})
 
   const router = await createRouter(app.context)
