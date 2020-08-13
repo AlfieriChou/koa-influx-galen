@@ -22,8 +22,8 @@ module.exports = async (baseConfig) => {
     ...baseConfig
   }
 
-  bindPropsToContext(app, config || {})
-  createInfluxClient(app, config || {})
+  bindPropsToContext(app, config)
+  createInfluxClient(app, config)
 
   const router = await createRouter(app.context)
   app.use(async (ctx, next) => {
