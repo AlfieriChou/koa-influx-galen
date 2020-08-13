@@ -15,10 +15,10 @@ module.exports = async (baseConfig) => {
 
   const projectRootPath = process.cwd()
   const config = {
-    influx: baseConfig.influx || { host: '127.0.0.1', database: 'test' },
-    influxModelPath: baseConfig.modelPath || path.join(process.cwd(), '/app/models'),
-    controllerDirPath: baseConfig.controllerDirPath || path.join(projectRootPath, '/app/controller'),
-    serviceDirPath: baseConfig.serviceDirPath || path.join(projectRootPath, '/app/service'),
+    influx: { host: '127.0.0.1', database: 'test' },
+    influxModelPath: path.join(process.cwd(), '/app/models'),
+    controllerDirPath: path.join(projectRootPath, '/app/controller'),
+    serviceDirPath: path.join(projectRootPath, '/app/service'),
     ...baseConfig
   }
 
