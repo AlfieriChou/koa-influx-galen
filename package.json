@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "influx": "^5.5.2",
+    "jsonschema": "^1.2.6",
     "koa": "^2.13.0",
     "koa-body": "^4.2.0",
     "koa-bodyparser": "^4.3.0",

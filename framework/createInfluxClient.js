@@ -16,16 +16,18 @@ module.exports = (app, { influx, influxModelPath }) => {
     const schema = require(filepath)
     const filename = path.basename(filepath).replace(/\.\w+$/, '')
 
+    const requiredFields = Object.entries(schema.properties).reduce((acc, [key, prop]) => {
+      if (prop.required) {
+        return [...acc, key]
+      }
+      return acc
+    }, [])
+
     const remoteMethods = buidlRemoteMethods({
       remoteMethods: {},
       ...schema,
       modelName: filename,
-      required: Object.entries(schema.properties).reduce((acc, [key, prop]) => {
-        if (prop.required) {
-          return [...acc, key]
-        }
-        return acc
-      }, [])
+      required: requiredFields
     })
 
     ctx.remoteMethods = {

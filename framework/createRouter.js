@@ -1,11 +1,32 @@
 const Router = require('koa-router')
 const _ = require('lodash')
+const { Validator } = require('jsonschema')
 
 const BaseController = require('./controller/baseController')
 
+const v = new Validator()
+
+const validate = async apiInfo => async (ctx, next) => {
+  if (!apiInfo.requestBody) {
+    return next()
+  }
+  const { body, required = [] } = apiInfo.requestBody
+  const validateRets = await v.validate(ctx.request.body, {
+    type: 'object', properties: body, required
+  })
+  if (validateRets.errors.length > 0) {
+    const errMsg = validateRets.errors.reduce((acc, error, index) => ([
+      ...acc,
+      `${index + 1}: ${error.message}`
+    ]), []).join()
+    ctx.throw(400, errMsg)
+  }
+  return next()
+}
+
 const camelObjKeys = (obj) => {
   if (Array.isArray(obj)) {
-    return obj.map(v => camelObjKeys(v))
+    return obj.map(value => camelObjKeys(value))
   }
   if (obj !== null && obj.constructor === Object) {
     return Object.keys(obj)
@@ -28,6 +49,7 @@ module.exports = async (context, prefix = '/v1') => {
     const [modelName, handler] = key.split('-')
     router[value.method](
       value.path,
+      await validate(value),
       // eslint-disable-next-line consistent-return
       async (ctx) => {
         ctx.tableName = _.snakeCase(modelName)
