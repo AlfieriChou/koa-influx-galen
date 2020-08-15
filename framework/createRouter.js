@@ -15,11 +15,8 @@ const validate = async apiInfo => async (ctx, next) => {
     type: 'object', properties: body, required
   })
   if (validateRets.errors.length > 0) {
-    const errMsg = validateRets.errors.reduce((acc, error, index) => ([
-      ...acc,
-      `${index + 1}: ${error.message}`
-    ]), []).join()
-    ctx.throw(400, errMsg)
+    const [error] = validateRets.errors
+    ctx.throw(400, error.stack)
   }
   return next()
 }
