@@ -18,10 +18,14 @@ const parseFilter = ({
     Object.entries(where).forEach(([key, value]) => {
       if ([...tags, 'time'].includes(key)) {
         if (typeof value !== 'object') {
-          query += `where ${key} = '${value}'`
+          query += ` where ${key} = '${value}'`
         } else {
           Object.entries(value).forEach(([vKey, vValue]) => {
-            query += `where ${key} ${operators[vKey]} = '${vValue}'`
+            if (key === 'time') {
+              query += ` where ${key} ${operators[vKey]} '${new Date(vValue).toISOString()}'`
+            } else {
+              query += ` where ${key} ${operators[vKey]} '${vValue}'`
+            }
           })
         }
       } else {
