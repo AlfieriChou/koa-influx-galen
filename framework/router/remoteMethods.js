@@ -18,10 +18,9 @@ const buildBaseRemoteMethods = (schema) => {
         200: {
           type: 'object',
           result: {
-            count: { type: 'integer', description: '总数' },
-            offset: { type: 'integer', description: '偏移量' },
-            limit: { type: 'integer', description: '限制数量' },
-            data: { type: 'array', items: { type: 'object', properties }, description: '数据' }
+            code: { type: 'integer', description: '返回编码' },
+            message: { type: 'string', description: '返回描述' },
+            result: { type: 'array', items: { type: 'object', properties }, description: '返回数据' }
           }
         }
       }
@@ -38,7 +37,11 @@ const buildBaseRemoteMethods = (schema) => {
       output: {
         200: {
           type: 'object',
-          result: properties
+          result: {
+            code: { type: 'integer', description: '返回编码' },
+            message: { type: 'string', description: '返回描述' },
+            result: { type: 'object', properties, description: '返回数据' }
+          }
         }
       }
     }

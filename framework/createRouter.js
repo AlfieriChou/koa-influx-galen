@@ -81,7 +81,7 @@ module.exports = async (context, prefix = '/v1') => {
         if (BaseController[handler]) {
           const ret = await BaseController[handler](ctx)
           ctx.body = {
-            status: 200,
+            code: 0,
             message: 'success',
             result: camelObjKeys(ret)
           }
