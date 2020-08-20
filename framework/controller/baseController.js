@@ -1,7 +1,14 @@
 const _ = require('lodash')
 
+const operators = {
+  $gt: '>',
+  $lt: '<',
+  $gte: '>=',
+  $lte: '<='
+}
+
 const parseFilter = ({
-  tableName, filter, properties, tags
+  tableName, filter, tags
 }) => {
   const {
     where, order, limit, offset
@@ -9,13 +16,20 @@ const parseFilter = ({
   let query = `select * from ${tableName}`
   if (Object.keys(where).length > 0) {
     Object.entries(where).forEach(([key, value]) => {
-      if (!properties[key] || !properties[key].type || !tags.includes(key)) {
-        throw new Error(`${key} is not a valid property`)
-      }
-      if (properties[key].type === 'string') {
-        query += ` where ${key} = '${value}'`
+      if ([...tags, 'time'].includes(key)) {
+        if (typeof value !== 'object') {
+          query += ` where ${key} = '${value}'`
+        } else {
+          Object.entries(value).forEach(([vKey, vValue]) => {
+            if (key === 'time') {
+              query += ` where ${key} ${operators[vKey]} '${new Date(vValue).toISOString()}'`
+            } else {
+              query += ` where ${key} ${operators[vKey]} '${vValue}'`
+            }
+          })
+        }
       } else {
-        query += ` where ${key} = ${value}`
+        throw new Error(`${key} is not a valid property`)
       }
     })
   }
