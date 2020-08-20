@@ -33,11 +33,20 @@ const parseFilter = ({
 
 module.exports = class Controller {
   static async index (ctx) {
-    const { query: { filter }, schema, tableName } = ctx
+    const {
+      query: {
+        where = '{}',
+        order = 'time desc',
+        limit = 20,
+        offset = 0
+      },
+      schema,
+      tableName
+    } = ctx
     return ctx.influx.query(parseFilter({
       tableName,
-      filter: filter ? JSON.parse(filter) : {
-        where: {}, order: 'time desc', limit: 100, offset: 0
+      filter: {
+        where: JSON.parse(where), order, limit, offset
       },
       ...schema
     }))

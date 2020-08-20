@@ -3,8 +3,24 @@ const _ = require('lodash')
 const { Validator } = require('jsonschema')
 
 const BaseController = require('./controller/baseController')
+const { openapiJson, htmlDoc } = require('./doc/openapi')
 
 const v = new Validator()
+
+const openapiInfo = {
+  title: 'Koa-influx-galen API document',
+  version: 'v3',
+  description: 'openapi3.0 document',
+  contact: {
+    name: 'AlfieriChou',
+    email: 'alfierichou@gmail.com',
+    url: 'https://github.com/AlfieriChou/koa-influx-galen'
+  },
+  license: {
+    name: 'MIT',
+    url: 'https://github.com/AlfieriChou/koa-influx-galen/blob/master/LICENSE'
+  }
+}
 
 const validate = async apiInfo => async (ctx, next) => {
   if (!apiInfo.requestBody) {
@@ -39,7 +55,18 @@ module.exports = async (context, prefix = '/v1') => {
   const router = new Router()
   router.prefix(prefix)
 
-  const { remoteMethods, jsonSchema } = context
+  const { remoteMethods, jsonSchema, schemas } = context
+
+  router.get('/swagger.json', async (ctx) => {
+    if (ctx.query.isReload) {
+      ctx.body = await openapiJson(schemas, remoteMethods, openapiInfo, { isReload: true })
+    }
+    ctx.body = await openapiJson(schemas, remoteMethods, openapiInfo)
+  })
+
+  router.get('/apidoc', async (ctx) => {
+    ctx.body = htmlDoc(ctx.query.isReload ? '/v1/swagger.json?isReload=true' : '/v1/swagger.json')
+  })
 
   await Object.entries(remoteMethods).reduce(async (promise, [key, value]) => {
     await promise

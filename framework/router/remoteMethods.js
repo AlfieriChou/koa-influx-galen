@@ -10,7 +10,7 @@ const buildBaseRemoteMethods = (schema) => {
       summary: `获取${description}列表`,
       query: {
         where: { type: 'json', description: '搜索条件 例如：where={}' },
-        order: { type: 'array', description: '排序 例如：order=[["createdAt","desc"]]' },
+        order: { type: 'array', description: '排序 例如：order=time desc' },
         offset: { type: 'integer', description: '分页偏移量 例如：offset=0' },
         limit: { type: 'integer', description: '分页数量 例如：limit=20' }
       },
