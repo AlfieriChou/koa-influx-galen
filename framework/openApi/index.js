@@ -1,18 +1,18 @@
 const ExpireStore = require('expire-store')
-const buildOpenapiDoc = require('./buildOpenapiDoc')
+const buildOpenApiDoc = require('./buildOpenApiDoc')
 
 const docStore = new ExpireStore(60000)
 
 module.exports = {
-  openapiJson: async (schemas, remoteMethods, info, options = {}) => {
+  openApiJson: async (schemas, remoteMethods, info, options = {}) => {
     const { isReload } = options
     if (isReload) {
-      return buildOpenapiDoc(schemas, remoteMethods, info)
+      return buildOpenApiDoc(schemas, remoteMethods, info)
     }
-    let doc = docStore.get('openapi')
+    let doc = docStore.get('openApi')
     if (typeof doc === 'undefined') {
-      doc = await buildOpenapiDoc(schemas, remoteMethods, info)
-      docStore.set('openapi', doc)
+      doc = await buildOpenApiDoc(schemas, remoteMethods, info)
+      docStore.set('openApi', doc)
     }
     return doc
   },

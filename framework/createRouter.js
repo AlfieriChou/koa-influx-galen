@@ -3,14 +3,14 @@ const _ = require('lodash')
 const { Validator } = require('jsonschema')
 
 const BaseController = require('./controller/baseController')
-const { openapiJson, htmlDoc } = require('./doc/openapi')
+const { openApiJson, htmlDoc } = require('./openApi')
 
 const v = new Validator()
 
-const openapiInfo = {
+const openApiInfo = {
   title: 'Koa-influx-galen API document',
   version: 'v3',
-  description: 'openapi3.0 document',
+  description: 'openApi 3.0 document',
   contact: {
     name: 'AlfieriChou',
     email: 'alfierichou@gmail.com',
@@ -59,9 +59,9 @@ module.exports = async (context, prefix = '/v1') => {
 
   router.get('/swagger.json', async (ctx) => {
     if (ctx.query.isReload) {
-      ctx.body = await openapiJson(schemas, remoteMethods, openapiInfo, { isReload: true })
+      ctx.body = await openApiJson(schemas, remoteMethods, openApiInfo, { isReload: true })
     }
-    ctx.body = await openapiJson(schemas, remoteMethods, openapiInfo)
+    ctx.body = await openApiJson(schemas, remoteMethods, openApiInfo)
   })
 
   router.get('/apidoc', async (ctx) => {
