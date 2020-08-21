@@ -36,9 +36,9 @@ module.exports = async (baseConfig) => {
     ctx.set('Access-Control-Max-Age', 86400000)
     ctx.set('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, POST, DELETE')
     ctx.set('Access-Control-Allow-Headers', 'x-requested-with, accept, origin, content-type')
-    await next()
-    const duration = Date.now() - start
     try {
+      await next()
+      const duration = Date.now() - start
       await ctx.influx.writePoints([{
         measurement: 'response_times',
         tags: { host: os.hostname() },
