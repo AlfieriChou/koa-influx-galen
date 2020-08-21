@@ -11,7 +11,7 @@ const parseFilter = ({
   tableName, filter, tags
 }) => {
   const {
-    where, order, limit, offset
+    where, order, limit // offset
   } = filter
   let query = `select * from ${tableName}`
   if (Object.keys(where).length > 0) {
@@ -36,9 +36,9 @@ const parseFilter = ({
   if (order) {
     query += ` order by ${order}`
   }
-  if (offset) {
-    query += ` offset ${offset}`
-  }
+  // if (offset) {
+  //   query += ` offset ${offset}`
+  // }
   if (limit) {
     query += ` limit ${limit}`
   }
@@ -51,8 +51,8 @@ module.exports = class Controller {
       query: {
         where = '{}',
         order = 'time desc',
-        limit = 20,
-        offset = 0
+        limit = 20
+        // offset = 0
       },
       schema,
       tableName
@@ -60,7 +60,7 @@ module.exports = class Controller {
     return ctx.influx.query(parseFilter({
       tableName,
       filter: {
-        where: JSON.parse(where), order, limit, offset
+        where: JSON.parse(where), order, limit // offset
       },
       ...schema
     }))
