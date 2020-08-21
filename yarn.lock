@@ -1735,6 +1735,11 @@ execa@^4.0.1:
     signal-exit "^3.0.2"
     strip-final-newline "^2.0.0"
 
+expire-store@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/expire-store/-/expire-store-1.0.2.tgz#4f87023fd4561560455e2dfbe12d919a464806f1"
+  integrity sha512-9FUz35m/0y/cU8zQTbwdGPWtSC/Fj4ESdzUMl00bEufixF4ITxX59abD6LQMKmYrOmEXQJcy6em/IjCkkCckEg==
+
 extend@^3.0.0:
   version "3.0.2"
   resolved "https://registry.npm.taobao.org/extend/download/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"

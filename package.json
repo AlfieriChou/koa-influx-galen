@@ -29,6 +29,7 @@
     "standard-version": "^8.0.2"
   },
   "dependencies": {
+    "expire-store": "^1.0.2",
     "influx": "^5.5.2",
     "jsonschema": "^1.2.6",
     "koa": "^2.13.0",

@@ -10,19 +10,15 @@ const buildBaseRemoteMethods = (schema) => {
       summary: `获取${description}列表`,
       query: {
         where: { type: 'json', description: '搜索条件 例如：where={}' },
-        order: { type: 'array', description: '排序 例如：order=[["createdAt","desc"]]' },
+        order: { type: 'array', description: '排序 例如：order=time desc' },
         offset: { type: 'integer', description: '分页偏移量 例如：offset=0' },
         limit: { type: 'integer', description: '分页数量 例如：limit=20' }
       },
       output: {
         200: {
-          type: 'object',
-          result: {
-            count: { type: 'integer', description: '总数' },
-            offset: { type: 'integer', description: '偏移量' },
-            limit: { type: 'integer', description: '限制数量' },
-            data: { type: 'array', items: { type: 'object', properties }, description: '数据' }
-          }
+          code: { type: 'integer', description: '返回编码' },
+          message: { type: 'string', description: '返回描述' },
+          result: { type: 'array', items: { type: 'object', properties }, description: '返回数据' }
         }
       }
     },
@@ -37,8 +33,9 @@ const buildBaseRemoteMethods = (schema) => {
       },
       output: {
         200: {
-          type: 'object',
-          result: properties
+          code: { type: 'integer', description: '返回编码' },
+          message: { type: 'string', description: '返回描述' },
+          result: { type: 'object', properties, description: '返回数据' }
         }
       }
     }

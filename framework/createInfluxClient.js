@@ -11,6 +11,7 @@ module.exports = (app, { influx, influxModelPath }) => {
   // eslint-disable-next-line no-param-reassign
   ctx.jsonSchema = {}
   ctx.remoteMethods = {}
+  ctx.schemas = {}
   const schemas = readDirFilenames(influxModelPath).reduce((ret, filepath) => {
     // eslint-disable-next-line global-require, import/no-dynamic-require
     const schema = require(filepath)
@@ -46,6 +47,14 @@ module.exports = (app, { influx, influxModelPath }) => {
         remoteMethods
       }
     }
+
+    ctx.schemas = {
+      ...ctx.schemas,
+      [filename]: {
+        type: 'object', properties: schema.properties || {}
+      }
+    }
+
     return [...ret, createSchema({
       tableName: _.snakeCase(filename),
       ...schema
