@@ -24,13 +24,13 @@ PS: query添加isReload条件，强制生成文档，否则，将会缓存60秒
 * json
 
 ```url
-http://127.0.0.1:3000/api/swagger.json
+http://127.0.0.1:3000/v1/swagger.json
 ```
 
 * html
 
 ```url
-http://127.0.0.1:3000/api/apidoc
+http://127.0.0.1:3000/v1/apidoc
 ```
 
 ### 搜索
@@ -57,7 +57,7 @@ http://127.0.0.1:3000/v1/responseTimes?where={"time":{"$gt":1597745072984}}&orde
 
 ## 目前存在的问题
 
-* [ ] 未支持虚拟的model类型
+* [x] 未支持虚拟的model类型
 * [ ] 异步检查measurement是否存在改为同步逻辑
 * [ ] 未支持koa中间件注入
 * [ ] koa安全关闭
