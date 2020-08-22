@@ -68,9 +68,19 @@ module.exports = async (context, prefix = '/v1') => {
     ctx.body = htmlDoc(ctx.query.isReload ? '/v1/swagger.json?isReload=true' : '/v1/swagger.json')
   })
 
+  // eslint-disable-next-line consistent-return
   await Object.entries(remoteMethods).reduce(async (promise, [key, value]) => {
     await promise
     const [modelName, handler] = key.split('-')
+
+    const { dialect } = jsonSchema[modelName]
+    if (dialect && dialect === 'virtual') {
+      // eslint-disable-next-line consistent-return
+      return router[value.method](value.path, async (ctx) => {
+        ctx.body = await ctx.controller[modelName][handler](ctx)
+      })
+    }
+
     router[value.method](
       value.path,
       await validate(value),
