@@ -4,7 +4,7 @@ const readDirFilenames = require('read-dir-filenames')
 const _ = require('lodash')
 
 const createSchema = require('./model/schema')
-const buidlRemoteMethods = require('./router/remoteMethods')
+const buildRemoteMethods = require('./router/remoteMethods')
 
 module.exports = async (app, { influx, influxModelPath }) => {
   const ctx = app.context
@@ -24,7 +24,7 @@ module.exports = async (app, { influx, influxModelPath }) => {
       return acc
     }, [])
 
-    const remoteMethods = buidlRemoteMethods({
+    const remoteMethods = buildRemoteMethods({
       remoteMethods: {},
       ...schema,
       modelName: filename,
