@@ -6,7 +6,7 @@ const _ = require('lodash')
 const createSchema = require('./model/schema')
 const buidlRemoteMethods = require('./router/remoteMethods')
 
-module.exports = (app, { influx, influxModelPath }) => {
+module.exports = async (app, { influx, influxModelPath }) => {
   const ctx = app.context
   // eslint-disable-next-line no-param-reassign
   ctx.jsonSchema = {}
@@ -67,12 +67,8 @@ module.exports = (app, { influx, influxModelPath }) => {
   })
   // eslint-disable-next-line no-param-reassign
   ctx.influx = influxClient
-  influxClient.getDatabaseNames()
-    .then((names) => {
-      if (names.includes(influx.database)) {
-        return
-      }
-      // eslint-disable-next-line consistent-return
-      return influxClient.createDatabase(influx.database)
-    })
+  const dbNames = await influxClient.getDatabaseNames()
+  if (!dbNames.includes(influx.database)) {
+    await influxClient.createDatabase(influx.database)
+  }
 }
