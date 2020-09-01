@@ -4,6 +4,8 @@ const koaLogger = require('koa-logger')
 const initializeApp = require('./framework/initializeApp')
 const config = require('./config')
 
+const exitTimeout = 60 * 1000
+
 const bootstrap = async () => {
   const app = await initializeApp(config)
   app.use(async (ctx, next) => {
@@ -43,8 +45,24 @@ const bootstrap = async () => {
       app.use(middleware)
     }
   }, Promise.resolve())
-  app.listen(3000, () => {
+  const server = app.listen(3000, () => {
     console.log('Listening on port 3000')
+  })
+  process.on('SIGINT', () => {
+    server.close(async () => {
+      process.exit(0)
+    })
+    setTimeout(() => {
+      process.exit(0)
+    }, exitTimeout)
+  })
+  process.on('SIGTERM', () => {
+    server.close(async () => {
+      process.exit(0)
+    })
+    setTimeout(() => {
+      process.exit(0)
+    }, exitTimeout)
   })
 }
 

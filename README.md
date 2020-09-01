@@ -59,5 +59,5 @@ http://127.0.0.1:3000/v1/responseTimes?where={"time":{"$gt":1597745072984}}&orde
 
 * [x] 未支持虚拟的model类型
 * [x] 异步检查database是否存在改为同步逻辑
-* [ ] 未支持koa中间件注入
-* [ ] koa安全关闭
+* [x] 未支持koa中间件注入
+* [x] koa安全关闭
