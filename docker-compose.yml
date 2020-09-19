@@ -1,4 +1,8 @@
 version: "3.2"
+
+networks:
+  galen:
+
 services:
   influx:
     image: influxdb:1.7-alpine
@@ -6,9 +10,19 @@ services:
       - 8086:8086
     restart: on-failure
     container_name: docker-influx
+    networks:
+      - galen
   loki:
     image: grafana/loki:latest
     ports:
       - 3100:3100
     restart: on-failure
     container_name: docker-loki
+    networks:
+      - galen
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 4500:3000
+    networks:
+      - galen
