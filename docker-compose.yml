@@ -12,17 +12,29 @@ services:
     container_name: docker-influx
     networks:
       - galen
+
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:1.5.0
     ports:
-      - 3100:3100
-    restart: on-failure
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
     container_name: docker-loki
     networks:
       - galen
+
+  promtail:
+    image: grafana/promtail:1.5.0
+    # volumes:
+      # - /var/log:/var/log
+    command: -config.file=/etc/promtail/docker-config.yaml
+    container_name: docker-promtail
+    networks:
+      - galen
+
   grafana:
     image: grafana/grafana:latest
     ports:
-      - 4500:3000
+      - "3000:3000"
+    container_name: docker-grafana
     networks:
       - galen
