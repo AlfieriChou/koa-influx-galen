@@ -2,6 +2,8 @@ const Influx = require('influx')
 const path = require('path')
 const readDirFilenames = require('read-dir-filenames')
 const _ = require('lodash')
+const fs = require('fs')
+const yaml = require('js-yaml')
 
 const createSchema = require('./model/schema')
 const buildRemoteMethods = require('./router/remoteMethods')
@@ -13,8 +15,18 @@ module.exports = async (app, { influx, influxModelPath }) => {
   ctx.remoteMethods = {}
   ctx.schemas = {}
   const schemas = readDirFilenames(influxModelPath).reduce((ret, filepath) => {
-    // eslint-disable-next-line global-require, import/no-dynamic-require
-    const schema = require(filepath)
+    let schema
+    if (filepath.endsWith('.json')) {
+      // eslint-disable-next-line global-require, import/no-dynamic-require
+      schema = require(filepath)
+    }
+    if (filepath.endsWith('.yaml')) {
+      try {
+        schema = yaml.safeLoad(fs.readFileSync(filepath, 'utf8'))
+      } catch (err) {
+        throw new Error(`${filepath.split('/').slice(-1)[0]} load yaml file error`)
+      }
+    }
     const filename = path.basename(filepath).replace(/\.\w+$/, '')
 
     const requiredFields = Object.entries(schema.properties).reduce((acc, [key, prop]) => {
