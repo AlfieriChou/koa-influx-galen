@@ -2,14 +2,16 @@ const os = require('os')
 const koaLogger = require('koa-logger')
 
 const initializeApp = require('./framework/initializeApp')
+const safeExit = require('./framework/safeExit')
 const config = require('./config')
 
-const exitTimeout = 60 * 1000
+let pendingCount = 0
 
 const bootstrap = async () => {
   const app = await initializeApp(config)
   app.use(async (ctx, next) => {
     const start = Date.now()
+    pendingCount += 1
     if (ctx.request.method === 'OPTIONS') {
       ctx.response.status = 200
     }
@@ -33,6 +35,8 @@ const bootstrap = async () => {
         message: err.message,
         stack: err.stack
       }
+    } finally {
+      pendingCount -= 1
     }
   })
   app.use(koaLogger())
@@ -48,22 +52,13 @@ const bootstrap = async () => {
   const server = app.listen(config.port, () => {
     console.log(`Listening on port ${config.port}`)
   })
-  process.on('SIGINT', () => {
-    server.close(async () => {
-      process.exit(0)
-    })
-    setTimeout(() => {
-      process.exit(0)
-    }, exitTimeout)
-  })
-  process.on('SIGTERM', () => {
-    server.close(async () => {
-      process.exit(0)
-    })
-    setTimeout(() => {
-      process.exit(0)
-    }, exitTimeout)
-  })
+  safeExit(server, () => new Promise((resolve) => {
+    if (pendingCount === 0) {
+      resolve()
+    } else {
+      app.on('pendingCount0', resolve)
+    }
+  }))
 }
 
 bootstrap()
