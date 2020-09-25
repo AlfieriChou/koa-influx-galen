@@ -9,6 +9,7 @@ let pendingCount = 0
 
 const bootstrap = async () => {
   const app = await initializeApp(config)
+  app.context.app = app
   app.use(async (ctx, next) => {
     const start = Date.now()
     pendingCount += 1
@@ -37,6 +38,9 @@ const bootstrap = async () => {
       }
     } finally {
       pendingCount -= 1
+      if (pendingCount === 0) {
+        ctx.app.emit('pendingCount0')
+      }
     }
   })
   app.use(koaLogger())
