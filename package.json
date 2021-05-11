@@ -39,7 +39,7 @@
     "koa-bodyparser": "^4.3.0",
     "koa-logger": "^3.2.1",
     "koa-router": "^9.1.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "read-dir-filenames": "^1.0.5"
   }
 }
